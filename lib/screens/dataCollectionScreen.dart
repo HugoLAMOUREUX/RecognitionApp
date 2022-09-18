@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -19,47 +20,24 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   double xGyr = 0.0;
   double yGyr = 0.0;
   double zGyr = 0.0;
-  bool recording = false;
+  var timer;
   TimeSerieModel timeSerie = TimeSerieModel();
-
-  DateTime lastModifiedAcc = DateTime.now();
-  DateTime lastModifiedGyr = DateTime.now();
-
-  double step = 0.005;
 
   @override
   void initState() {
     accelerometerEvents.listen((AccelerometerEvent event) {
-      if (DateTime.now().difference(lastModifiedAcc).inSeconds > step &&
-          recording) {
-        DateTime t = DateTime.now();
-        xAcc = event.x;
-        yAcc = event.y;
-        zAcc = event.z;
-        timeSerie.addTimeDataModel(
-            TimeDataModel.withAcc(t: t, ax: xAcc, ay: yAcc, az: zAcc));
-        lastModifiedAcc = t;
-        print(inspect(timeSerie));
-        //rebuild the widget
-        setState(() {});
-      }
+      xAcc = event.x;
+      yAcc = event.y;
+      zAcc = event.z;
+      //rebuild the widget
+      setState(() {});
     });
 
     gyroscopeEvents.listen((GyroscopeEvent event) {
-      if (DateTime.now().difference(lastModifiedGyr).inSeconds > step &&
-          recording) {
-        DateTime t = DateTime.now();
-
-        xGyr = event.x;
-        yGyr = event.y;
-        zGyr = event.z;
-        timeSerie.addTimeDataModel(
-            TimeDataModel.withGyr(t: t, gx: xGyr, gy: yGyr, gz: zGyr));
-
-        lastModifiedGyr = t;
-
-        setState(() {});
-      }
+      xGyr = event.x;
+      yGyr = event.y;
+      zGyr = event.z;
+      setState(() {});
       //print(event);
     });
     super.initState();
@@ -79,7 +57,18 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
             Text("zGyr : " + zGyr.toString()),
             ElevatedButton(
               onPressed: () {
-                recording = true;
+                timer = Timer.periodic(
+                    Duration(milliseconds: 50),
+                    (Timer t) => timeSerie.addTimeDataModel(
+                        TimeDataModel.withAll(
+                            t: DateTime.now(),
+                            ax: xAcc,
+                            ay: yAcc,
+                            az: zAcc,
+                            gx: xGyr,
+                            gy: yGyr,
+                            gz: zGyr)));
+                print(timeSerie);
               },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -94,7 +83,7 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                recording = false;
+                timer.cancel();
               },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(

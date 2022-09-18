@@ -7,6 +7,16 @@ class TimeDataModel {
   late double gy;
   late double gz;
 
+  TimeDataModel.withAll({
+    required this.t,
+    required this.ax,
+    required this.ay,
+    required this.az,
+    required this.gx,
+    required this.gy,
+    required this.gz,
+  });
+
   TimeDataModel.withAcc({
     required this.t,
     required this.ax,
