@@ -1,10 +1,15 @@
 import 'dart:async';
 import 'dart:developer';
 
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recognition/models/timeDataModel.dart';
 import 'package:recognition/models/timeSerieModel.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+
+import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DataCollectionScreen extends StatefulWidget {
   DataCollectionScreen({Key? key}) : super(key: key);
@@ -22,9 +27,22 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   double zGyr = 0.0;
   var timer;
   TimeSerieModel timeSerie = TimeSerieModel();
+  bool recording=false;
+
+  //pour realtime database
+  late DatabaseReference ref;
+
+  //pour cloud firestore
+  late var db;
+
+  //nombre de données entrées par enregistrement
+  int nbEntries=0;
+
+
 
   @override
   void initState() {
+    FirebaseDatabase database = FirebaseDatabase.instance;
     accelerometerEvents.listen((AccelerometerEvent event) {
       xAcc = event.x;
       yAcc = event.y;
@@ -40,6 +58,13 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
       setState(() {});
       //print(event);
     });
+
+    // pour utiliser realtime database,
+    ref = FirebaseDatabase.instance.ref("users/123");
+
+    // pour utiliser cloud firestore
+    db = FirebaseFirestore.instance;
+
     super.initState();
   }
 
@@ -56,10 +81,15 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
             Text("yGyr : " + yGyr.toString()),
             Text("zGyr : " + zGyr.toString()),
             ElevatedButton(
-              onPressed: () {
-                timer = Timer.periodic(
+              onPressed: recording ? null : () {
+                recording=true;
+                print(recording);
+                  setState((){});
+
+                   timer = Timer.periodic(
                     Duration(milliseconds: 50),
-                    (Timer t) => timeSerie.addTimeDataModel(
+                    (Timer t) {
+                      timeSerie.addTimeDataModel(
                         TimeDataModel.withAll(
                             t: DateTime.now(),
                             ax: xAcc,
@@ -67,8 +97,9 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                             az: zAcc,
                             gx: xGyr,
                             gy: yGyr,
-                            gz: zGyr)));
-                print(timeSerie);
+                            gz: zGyr));
+                      nbEntries++;}
+                   );
               },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -82,8 +113,36 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: !recording ? null: () {
+                recording=false;
+                print(recording);
+                setState((){});
+                Fluttertoast.showToast(
+                msg:'Recording ended with $nbEntries entries',
+                    fontSize:18,
+                );
                 timer.cancel();
+                nbEntries=0;
+
+
+                /*
+                //pour utiliser realtime database
+                ref.set({
+                  "name": "John",
+                  "age": 18,
+                  "address": {
+                    "line1": "100 Mountain View"
+                  }
+                });
+
+                //pour utiliser firestore
+                // Add a new document with a generated ID
+                db.collection("timeSeries").add(timeSerie.toListofMap()).then((DocumentReference doc) =>
+                    print('DocumentSnapshot added with ID: ${doc.id}'));
+
+                print("sent on firebase");
+
+                 */
               },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -101,4 +160,6 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
       ),
     );
   }
+
+
 }

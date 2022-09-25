@@ -21,4 +21,9 @@ class TimeSerieModel {
   String toString() {
     return timeSerie.toString();
   }
+
+  Map<String, dynamic> toListofMap(){
+    return timeSerie.first.toMap();
+    //temporairement juste le first
+  }
 }

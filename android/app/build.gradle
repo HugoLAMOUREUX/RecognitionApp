@@ -8,7 +8,8 @@ if (localPropertiesFile.exists()) {
 
 def flutterRoot = localProperties.getProperty('flutter.sdk')
 if (flutterRoot == null) {
-    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+    throw GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+    //new before GreadleException was removed by selim
 }
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
@@ -47,10 +48,15 @@ android {
         applicationId "com.example.recognition"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
-        minSdkVersion flutter.minSdkVersion
+
+        //the following line was modified from 'minSdkVersion flutter.minSdkVersion' by selim
+        minSdkVersion 19
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+
+        //the following line was added by selim for firestore
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -68,4 +74,7 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    //the following line was added by selim for firebase
+    implementation 'com.android.support:multidex:1.0.3'
 }
