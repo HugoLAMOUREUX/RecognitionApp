@@ -1,15 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:recognition/screens/Guest/Guest.dart';
+import 'package:recognition/screens/Guest/LoginScreen.dart';
+import 'package:recognition/screens/Guest/RegisterScreen.dart';
 import 'package:recognition/screens/dataCollectionScreen.dart';
 // Import the generated file
 import 'firebase_options.dart';
 
-
-
-
-
-Future main() async{
-
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
@@ -17,8 +15,6 @@ Future main() async{
   );
 
   runApp(const MyApp());
-
-
 }
 
 class MyApp extends StatelessWidget {
@@ -42,7 +38,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: DataCollectionScreen(),
+      home: GuestScreen(),
     );
   }
 }
