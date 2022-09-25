@@ -61,6 +61,18 @@ class TimeDataModel {
     this.gz = gz;
   }
 
+  Map<String,dynamic> toMap(){
+    return {
+      "t":t,
+      "ax":ax,
+      "ay":ay,
+      "az":az,
+      "gx":gx,
+      "gy":gy,
+      "gz":gz
+    };
+  }
+
   @override
   String toString() {
     return t.toString() +

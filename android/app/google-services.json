@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "171978070585",
+    "firebase_url": "https://activityrecognitionapp-5a32a-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "activityrecognitionapp-5a32a",
+    "storage_bucket": "activityrecognitionapp-5a32a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:171978070585:android:1f90597d9c8f1877684be8",
+        "android_client_info": {
+          "package_name": "com.example.recognition"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "171978070585-q5qa5bnqlig6ngpkt75gdkcsbfstbe7s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAshQE00xVl8ESOFAo9UYWuruxYR3ixSws"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "171978070585-q5qa5bnqlig6ngpkt75gdkcsbfstbe7s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "171978070585-75b0sqjfcm94mb96qs03vl356jp9id8t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.recognition"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
