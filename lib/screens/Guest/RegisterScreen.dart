@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:recognition/models/UserModel.dart';
 import 'package:recognition/screens/Guest/Guest.dart';
 import 'package:recognition/screens/Guest/LoginScreen.dart';
+import 'package:recognition/screens/dataCollectionScreen.dart';
+import 'package:recognition/services/UserService.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -17,6 +21,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String email = "";
   String firstName = "";
   String lastName = "";
+  UserService _userService = UserService();
+  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +162,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        if (_formKey.currentState!.validate()) {}
+                        if (_formKey.currentState!.validate()) {
+                          _userService
+                              .register(UserModel(
+                                  email: email,
+                                  password: password,
+                                  firstName: firstName,
+                                  lastName: lastName))
+                              .then((value) async {
+                            if (value != "" && value != null) {
+                              DocumentReference documentReference =
+                                  _firebaseFirestore
+                                      .collection('users')
+                                      .doc(email);
+
+                              await documentReference.set({
+                                "firstName": firstName,
+                                "lastName": lastName
+                              });
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          DataCollectionScreen()));
+                            }
+                          });
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.fromLTRB(40, 15, 40, 15),

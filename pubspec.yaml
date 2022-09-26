@@ -39,6 +39,7 @@ dependencies:
   fluttertoast: ^8.0.8
   firebase_database: any
   email_validator: "^2.1.16"
+  firebase_auth: ^3.10.0
 
 dev_dependencies:
   flutter_test:

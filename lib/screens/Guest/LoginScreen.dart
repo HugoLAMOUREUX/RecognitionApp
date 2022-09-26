@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:recognition/models/UserModel.dart';
 import 'package:recognition/screens/Guest/Guest.dart';
 import 'package:recognition/screens/Guest/RegisterScreen.dart';
+import 'package:recognition/screens/dataCollectionScreen.dart';
+import 'package:recognition/services/UserService.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isSecret = true;
   String password = "";
   String email = "";
+  UserService _userService = UserService();
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +111,22 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          if (_formKey.currentState!.validate()) {}
+                          if (_formKey.currentState!.validate()) {
+                            _userService
+                                .login(UserModel.b(
+                              email: email,
+                              password: password,
+                            ))
+                                .then((value) {
+                              if (value != "" && value != null) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            DataCollectionScreen()));
+                              }
+                            });
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.fromLTRB(40, 15, 40, 15),
