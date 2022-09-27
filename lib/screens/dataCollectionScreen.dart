@@ -67,7 +67,6 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
 
   @override
   void initState() {
-    FirebaseDatabase database = FirebaseDatabase.instance;
     getFirstName();
 
     accelerometerEvents.listen((AccelerometerEvent event) {

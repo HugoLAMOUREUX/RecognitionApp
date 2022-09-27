@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:recognition/screens/Guest/LoginScreen.dart';
 import 'package:recognition/screens/Guest/RegisterScreen.dart';
+import 'package:recognition/screens/dataCollectionScreen.dart';
 
 class GuestScreen extends StatelessWidget {
   const GuestScreen({super.key});
