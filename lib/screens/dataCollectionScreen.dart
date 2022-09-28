@@ -125,16 +125,17 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
             Text("yGyr : " + yGyr.toString()),
             Text("zGyr : " + zGyr.toString()),
             ElevatedButton(
-              onPressed: recording
-                  ? null
-                  : () {
-                      recording = true;
-                      print(recording);
-                      setState(() {});
+              onPressed: recording ? null : () {
+                recording=true;
+                print(recording);
+                  setState((){});
 
-                      timer =
-                          Timer.periodic(Duration(milliseconds: 50), (Timer t) {
-                        timeSerie.addTimeDataModel(TimeDataModel.withAll(
+
+                   timer = Timer.periodic(
+                    Duration(milliseconds: 50),
+                    (Timer t) {
+                      timeSerie.addTimeDataModel(
+                        TimeDataModel.withAll(
                             t: DateTime.now(),
                             ax: xAcc,
                             ay: yAcc,
@@ -178,17 +179,18 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                   "address": {
                     "line1": "100 Mountain View"
                   }
-                });
+                });*/
+
 
                 //pour utiliser firestore
                 // Add a new document with a generated ID
                 db.collection("timeSeries").add(timeSerie.toListofMap()).then((DocumentReference doc) =>
-                    print('DocumentSnapshot added with ID: ${doc.id}'));
+                    print('TimeSerie added with ID: ${doc.id}'));
 
-                print("sent on firebase");
+                print("sent on firestore");
 
-                 */
-                    },
+
+              },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5.0)),

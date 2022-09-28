@@ -23,7 +23,14 @@ class TimeSerieModel {
   }
 
   Map<String, dynamic> toListofMap(){
-    return timeSerie.first.toMap();
+    Map<String,dynamic> res={};
+    //int i=0;
+    for(TimeDataModel d in timeSerie){
+      DateTime time=d.t;
+      res["$time"]=d.toSensorsMap();
+      //i=i+1;
+    }
+    return res;
     //temporairement juste le first
   }
 }
