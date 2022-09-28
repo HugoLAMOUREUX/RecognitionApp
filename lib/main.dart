@@ -1,28 +1,45 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:recognition/screens/Guest/Guest.dart';
+import 'package:recognition/screens/Guest/LoginScreen.dart';
+import 'package:recognition/screens/Guest/RegisterScreen.dart';
 import 'package:recognition/screens/dataCollectionScreen.dart';
 // Import the generated file
 import 'firebase_options.dart';
 
-
-
-
-
-Future main() async{
-
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MyApp());
-
-
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MyApp extends StatefulWidget {
+  MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool connected = false;
+
+  @override
+  void initState() {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        print('User is currently signed out!');
+      } else {
+        print('User is signed in!');
+        connected = true;
+        setState(() {});
+      }
+    });
+  }
 
   // This widget is the root of your application.
   @override
@@ -42,7 +59,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: DataCollectionScreen(),
+      home: connected ? DataCollectionScreen() : GuestScreen(),
     );
   }
 }

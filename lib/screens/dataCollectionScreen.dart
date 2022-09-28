@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:developer';
 
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recognition/models/timeDataModel.dart';
 import 'package:recognition/models/timeSerieModel.dart';
+import 'package:recognition/screens/Guest/Guest.dart';
+import 'package:recognition/services/UserService.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
 import 'package:firebase_database/firebase_database.dart';
@@ -27,7 +29,11 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   double zGyr = 0.0;
   var timer;
   TimeSerieModel timeSerie = TimeSerieModel();
-  bool recording=false;
+  bool recording = false;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+
+  UserService _userService = UserService();
 
   //pour realtime database
   late DatabaseReference ref;
@@ -36,13 +42,33 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   late var db;
 
   //nombre de données entrées par enregistrement
-  int nbEntries=0;
+  int nbEntries = 0;
 
+  void getFirstName() async {
+    //pour recup l'user authentifié
+    final User? user = auth.currentUser;
+    //pour recup l'id de l'user authentifié
+    final uid = user!.uid;
+    print(uid);
+    print(user.email);
 
+    //recup le firstName de l'user authentifié
+    DocumentReference documentReference =
+        _firebaseFirestore.collection('users').doc(user.email);
+    DocumentSnapshot documentSnapshot = await documentReference.get();
+    if (documentSnapshot.exists) {
+      String firstName = documentSnapshot.get('firstName');
+      print("-----------------------");
+      print(firstName);
+      print("-----------------------");
+    }
+    //firstName est recup mtn
+  }
 
   @override
   void initState() {
-    FirebaseDatabase database = FirebaseDatabase.instance;
+    getFirstName();
+
     accelerometerEvents.listen((AccelerometerEvent event) {
       xAcc = event.x;
       yAcc = event.y;
@@ -74,6 +100,24 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
       child: Scaffold(
         body: Center(
           child: Column(children: [
+            ElevatedButton(
+              onPressed: (() async {
+                await _userService.logout();
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => GuestScreen()),
+                    (route) => false);
+              }),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.fromLTRB(40, 15, 40, 15),
+              ),
+              child: const Text(
+                'Logout',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             Text("xAcc : " + xAcc.toString()),
             Text("yAcc : " + yAcc.toString()),
             Text("zAcc : " + zAcc.toString()),
@@ -81,16 +125,16 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
             Text("yGyr : " + yGyr.toString()),
             Text("zGyr : " + zGyr.toString()),
             ElevatedButton(
-              onPressed: recording ? null : () {
-                recording=true;
-                print(recording);
-                  setState((){});
+              onPressed: recording
+                  ? null
+                  : () {
+                      recording = true;
+                      print(recording);
+                      setState(() {});
 
-                   timer = Timer.periodic(
-                    Duration(milliseconds: 50),
-                    (Timer t) {
-                      timeSerie.addTimeDataModel(
-                        TimeDataModel.withAll(
+                      timer =
+                          Timer.periodic(Duration(milliseconds: 50), (Timer t) {
+                        timeSerie.addTimeDataModel(TimeDataModel.withAll(
                             t: DateTime.now(),
                             ax: xAcc,
                             ay: yAcc,
@@ -98,9 +142,9 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                             gx: xGyr,
                             gy: yGyr,
                             gz: zGyr));
-                      nbEntries++;}
-                   );
-              },
+                        nbEntries++;
+                      });
+                    },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5.0)),
@@ -113,19 +157,20 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
               ),
             ),
             ElevatedButton(
-              onPressed: !recording ? null: () {
-                recording=false;
-                print(recording);
-                setState((){});
-                Fluttertoast.showToast(
-                msg:'Recording ended with $nbEntries entries',
-                    fontSize:18,
-                );
-                timer.cancel();
-                nbEntries=0;
+              onPressed: !recording
+                  ? null
+                  : () {
+                      recording = false;
+                      print(recording);
+                      setState(() {});
+                      Fluttertoast.showToast(
+                        msg: 'Recording ended with $nbEntries entries',
+                        fontSize: 18,
+                      );
+                      timer.cancel();
+                      nbEntries = 0;
 
-
-                /*
+                      /*
                 //pour utiliser realtime database
                 ref.set({
                   "name": "John",
@@ -143,7 +188,7 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                 print("sent on firebase");
 
                  */
-              },
+                    },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5.0)),
@@ -160,6 +205,4 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
       ),
     );
   }
-
-
 }
