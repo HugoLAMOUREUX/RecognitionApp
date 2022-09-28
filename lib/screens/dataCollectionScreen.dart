@@ -86,6 +86,7 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                 print(recording);
                   setState((){});
 
+
                    timer = Timer.periodic(
                     Duration(milliseconds: 50),
                     (Timer t) {
@@ -133,16 +134,17 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                   "address": {
                     "line1": "100 Mountain View"
                   }
-                });
+                });*/
+
 
                 //pour utiliser firestore
                 // Add a new document with a generated ID
                 db.collection("timeSeries").add(timeSerie.toListofMap()).then((DocumentReference doc) =>
-                    print('DocumentSnapshot added with ID: ${doc.id}'));
+                    print('TimeSerie added with ID: ${doc.id}'));
 
-                print("sent on firebase");
+                print("sent on firestore");
 
-                 */
+
               },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
