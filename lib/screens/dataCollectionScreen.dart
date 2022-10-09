@@ -8,6 +8,7 @@ import 'package:recognition/models/timeDataModel.dart';
 import 'package:recognition/models/timeSerieModel.dart';
 import 'package:recognition/screens/Guest/Guest.dart';
 import 'package:recognition/services/UserService.dart';
+import 'package:recognition/widgets/timeSerieWidget.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
 import 'package:firebase_database/firebase_database.dart';
@@ -28,15 +29,15 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   double yGyr = 0.0;
   double zGyr = 0.0;
   var timer;
-  TimeSerieModel timeSerie = TimeSerieModel();
+  late TimeSerieModel timeSerie;
+
+  late List<TimeDataModel> timeChartData;
+
   bool recording = false;
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
   UserService _userService = UserService();
-
-  //pour realtime database
-  late DatabaseReference ref;
 
   //pour cloud firestore
   late var db;
@@ -44,11 +45,25 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   //nombre de données entrées par enregistrement
   int nbEntries = 0;
 
+  //user data
+  late  User user;
+  late  String uid;
+
+
+  //test test
+  List<TimeDataModel> dataseries = [
+  TimeDataModel.withAcc(t:DateTime(2019,2,3),ax:2,ay:2,az:2),
+  TimeDataModel.withAcc(t:DateTime(2019,2,9),ax:2,ay:3,az:2),
+  TimeDataModel.withAcc(t:DateTime(2019,2,17),ax:2,ay:1,az:2),
+  TimeDataModel.withAcc(t:DateTime(2019,2,24),ax:2,ay:6,az:2),
+  ];
+
+
   void getFirstName() async {
-    //pour recup l'user authentifié
-    final User? user = auth.currentUser;
-    //pour recup l'id de l'user authentifié
-    final uid = user!.uid;
+    //pour recup l'user authentifié //pourquoi final ? si on se deco reco ?
+    final user = auth.currentUser;
+    //pour recup l'id de l'user authentifié // idem ?
+    uid = user!.uid;
     print(uid);
     print(user.email);
 
@@ -69,6 +84,8 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   void initState() {
     getFirstName();
 
+    timeSerie= TimeSerieModel(this.uid);
+
     accelerometerEvents.listen((AccelerometerEvent event) {
       xAcc = event.x;
       yAcc = event.y;
@@ -82,11 +99,7 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
       yGyr = event.y;
       zGyr = event.z;
       setState(() {});
-      //print(event);
     });
-
-    // pour utiliser realtime database,
-    ref = FirebaseDatabase.instance.ref("users/123");
 
     // pour utiliser cloud firestore
     db = FirebaseFirestore.instance;
@@ -129,8 +142,6 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                 recording=true;
                 print(recording);
                   setState((){});
-
-
                    timer = Timer.periodic(
                     Duration(milliseconds: 50),
                     (Timer t) {
@@ -163,6 +174,8 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                   : () {
                       recording = false;
                       print(recording);
+                      timeChartData=timeSerie.getTimeSerieModel();
+
                       setState(() {});
                       Fluttertoast.showToast(
                         msg: 'Recording ended with $nbEntries entries',
@@ -171,25 +184,11 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                       timer.cancel();
                       nbEntries = 0;
 
-                      /*
-                //pour utiliser realtime database
-                ref.set({
-                  "name": "John",
-                  "age": 18,
-                  "address": {
-                    "line1": "100 Mountain View"
-                  }
-                });*/
-
-
                 //pour utiliser firestore
-                // Add a new document with a generated ID
                 db.collection("timeSeries").add(timeSerie.toListofMap()).then((DocumentReference doc) =>
                     print('TimeSerie added with ID: ${doc.id}'));
-
+                // Ajoute une nouvelle  timeseries avec un id généré
                 print("sent on firestore");
-
-
               },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -201,10 +200,50 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                 'STOP'.toUpperCase(),
                 style: TextStyle(color: Colors.white),
               ),
-            )
+            ),
+            /*
+            // JE MET EN COMMENTAIRE PARCE QUE CA CREE DES WARNING
+            // JAI COMMENTE LA DEPENDANCE CORRESPONDANTE DANS PUBSPEC
+            // ET COMMENTE LA CLASSE TIMESERIEWIDGET
+            Container(
+               child: TimeSerieChart.withSampleData(),
+               height: 300,
+             ),
+            //BOUTON TEST AJOUT DE POINT A LA SERIE
+            ElevatedButton(
+              onPressed: true ? _addPoint():null,
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0)),
+                padding: const EdgeInsets.symmetric(vertical: 15.0),
+                primary: Theme.of(context).primaryColor,
+              ),
+              child: Text(
+                'Add Point'.toUpperCase(),
+                style: TextStyle(color: Colors.white),
+              ),
+            )*/
           ]),
         ),
       ),
     );
   }
+  /// Function to add new point to time series
+   _addPoint(){
+    this.dataseries.add(TimeDataModel.withAcc(t:DateTime(2019,3,10),ax:2,ay:2,az:2));
+    setState(() {});
+    Fluttertoast.showToast(
+      msg: 'point ajouté peut etre',
+      fontSize: 18,
+    );
+    return null;
+  }
+
+  /// Sample time series data
+  List<TimeDataModel> _createData() {
+    return this.dataseries;
+  }
+
+
 }
+
