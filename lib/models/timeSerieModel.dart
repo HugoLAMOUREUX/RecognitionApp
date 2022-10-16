@@ -11,11 +11,6 @@ class TimeSerieModel {
     timeSerie = [];
   }
 
-  TimeSerieModel.withoutOwner() {
-    timeSerie = [];
-    owner = "test";
-  }
-
   void addTimeDataModel(TimeDataModel data) {
     timeSerie.add(data);
   }
