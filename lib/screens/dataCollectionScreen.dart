@@ -39,7 +39,6 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
-  late TimeSerieModel timeSerie;
 
   UserService _userService = UserService();
 
