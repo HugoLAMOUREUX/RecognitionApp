@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:recognition/screens/Guest/Guest.dart';
 import 'package:recognition/screens/Guest/LoginScreen.dart';
 import 'package:recognition/screens/Guest/RegisterScreen.dart';
+import 'package:recognition/screens/HomeScreen.dart';
+import 'package:recognition/screens/LabelizeScreen.dart';
 import 'package:recognition/screens/dataCollectionScreen.dart';
 // Import the generated file
 import 'firebase_options.dart';
@@ -59,7 +61,7 @@ class _MyAppState extends State<MyApp> {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: connected ? DataCollectionScreen() : GuestScreen(),
+      home: connected ? HomeScreen() : GuestScreen(),
     );
   }
 }
