@@ -1,5 +1,5 @@
 class TimeDataModel {
-  late DateTime t;
+  late int t;
   late double ax;
   late double ay;
   late double az;

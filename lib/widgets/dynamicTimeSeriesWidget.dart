@@ -30,15 +30,6 @@ class DynamicTimeSeriesWidget extends StatefulWidget {
 class _DynamicTimeSeriesWidgetState extends State<DynamicTimeSeriesWidget> {
   //late TooltipBehavior _tooltipBehavior; usefull ? useless ?
   late ChartSeriesController _chartSeriesController;
-  late List<TimeDataModel> chartData=<TimeDataModel> [
-  TimeDataModel.withAcc(t:DateTime(2022,10,5),ax:2,ay:6,az:2),
-    TimeDataModel.withAcc(t:DateTime(2022,10,6),ax:2,ay:1,az:2),
-    TimeDataModel.withAcc(t:DateTime(2022,10,7),ax:2,ay:3,az:2),
-    TimeDataModel.withAcc(t:DateTime(2022,10,8),ax:2,ay:2,az:2),
-    TimeDataModel.withAcc(t:DateTime(2022,10,9),ax:2,ay:1,az:2)
-
-  ];
-
   late Timer timer;
 
   @override
@@ -68,15 +59,6 @@ class _DynamicTimeSeriesWidgetState extends State<DynamicTimeSeriesWidget> {
       ],
     );
   }
-// maintenant, chartData est obtenu de dehors, il faut un moyen d'appeler updatadatasource depuis l'extérieur
-  int i=10;
-  void updateDataSource(Timer t){
-    chartData.add(TimeDataModel.withAcc(t:DateTime(2022,10,i),ax:2,ay:math.Random().nextDouble()*10,az:2));
-    i++;
-    _chartSeriesController.updateDataSource(
-      addedDataIndex: chartData.length-1
-    );
-  }
 
   int j=0;
   void updateSensorView(){
@@ -93,7 +75,7 @@ class _DynamicTimeSeriesWidgetState extends State<DynamicTimeSeriesWidget> {
       LineSeries<TimeDataModel,num>(
         enableTooltip: false,
           dataSource: widget.inputChartData,
-          xValueMapper: (TimeDataModel measures,_)=> measures.t.microsecondsSinceEpoch,
+          xValueMapper: (TimeDataModel measures,_)=> measures.t,
           yValueMapper: (TimeDataModel measures,_)=> measures.ay,
           onRendererCreated: (ChartSeriesController controller){
             _chartSeriesController=controller;

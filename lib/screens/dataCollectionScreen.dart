@@ -52,19 +52,11 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   late  User user;
   late  String uid;
 
-  List<StreamSubscription<dynamic>> _streamSubscriptions = <StreamSubscription<dynamic>>[];
+  final List<StreamSubscription<dynamic>> _streamSubscriptions = <StreamSubscription<dynamic>>[];
 
 
 
   final _controller=TimeSeriesUpdateController();
-
-  //test test
-  List<TimeDataModel> dataseries = [
-    TimeDataModel.withAcc(t: DateTime(2019, 2, 3), ax: 2, ay: 2, az: 2),
-    TimeDataModel.withAcc(t: DateTime(2019, 2, 9), ax: 2, ay: 3, az: 2),
-    TimeDataModel.withAcc(t: DateTime(2019, 2, 17), ax: 2, ay: 1, az: 2),
-    TimeDataModel.withAcc(t: DateTime(2019, 2, 24), ax: 2, ay: 6, az: 2),
-  ];
 
   void getFirstName() async {
     //pour recup l'user authentifié
@@ -150,7 +142,7 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                       timer =
                           Timer.periodic(Duration(milliseconds: 50), (Timer t) {
                         timeSerie.addTimeDataModel(TimeDataModel.withAll(
-                            t: DateTime.now(),
+                            t: DateTime.now().microsecondsSinceEpoch,
                             ax: xAcc,
                             ay: yAcc,
                             az: zAcc,
@@ -222,26 +214,38 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
 
              */
             Container(
+              height: 200,
               child: FutureBuilder<Map<String, dynamic>>(
                   future: getDataFromFireStore(),
                   builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
                     if (snapshot.hasData) {
                       return Center( // here only return is missing
-                          child: Text(snapshot.data!["Activity"])
-                      );
+                          child: TimeSeriesChartWidget(snapshot.data!["TimeSerie"].map<TimeDataModel>((data) {
+                            return TimeDataModel.withAll(
+                                t: data['t'],
+                                ax: data['ax'],
+                                ay: data['ay'],
+                                az: data['az'],
+                                gx: data['gx'],
+                                gy: data['gy'],
+                                gz: data['gz']
+                            );
+                          }
+                      ).toList()
+                          )
+                          );
                     }
                     if (snapshot.hasError) {
                       return Text('error $snapshot.data["Activity"]');
                     }
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
+                      return const Center(
                         child: Text("waiting"),
                       );
                     }
-                    return Text("not catched");
+                    return const Text("not catched");
                   }
     ),
-            height: 30,
             ),
 
           ]),
@@ -254,7 +258,7 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   Future<Map<String, dynamic>> getDataFromFireStore() async {
 
     return await db.collection("timeSeries")
-        .doc("3LZLaKsGUSXZWgjySgZI")
+        .doc("K1BB7JQSAZnU9i0d9rv0")
         .get()
         .then(
           (DocumentSnapshot doc) {
