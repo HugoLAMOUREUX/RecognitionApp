@@ -48,8 +48,8 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   int nbEntries = 0;
 
   //user data
-  User? user;
-  String? uid;
+  late User user;
+  late String uid;
 
   //test test
   List<TimeDataModel> dataseries = [
@@ -60,7 +60,7 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   ];
 
   void getFirstName() async {
-    // //pour recup l'user authentifié //pourquoi final ? si on se deco reco ?
+    /* // //pour recup l'user authentifié //pourquoi final ? si on se deco reco ?
     // user = auth.currentUser;
     // //pour recup l'id de l'user authentifié // idem ?
     // uid = user?.uid;
@@ -82,7 +82,28 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
 
     //recup le firstName de l'user authentifié
     DocumentReference documentReference =
-        _firebaseFirestore.collection('users').doc(user?.email);
+        _firebaseFirestore.collection('users').doc(user.email);
+    DocumentSnapshot documentSnapshot = await documentReference.get();
+    if (documentSnapshot.exists) {
+      String firstName = documentSnapshot.get('firstName');
+      print("-----------------------");
+      print(firstName);
+      print("-----------------------");
+    }
+    //firstName est recup mtn
+    */
+    //pour recup l'user authentifié //pourquoi final ? si on se deco reco ?
+    print("debut datascreen collection auth");
+    final user = auth.currentUser;
+    //pour recup l'id de l'user authentifié // idem ?
+    uid = user!.uid;
+    print("uid dans datascreen collection");
+    print(uid);
+    print(user.email);
+
+    //recup le firstName de l'user authentifié
+    DocumentReference documentReference =
+        _firebaseFirestore.collection('users').doc(user.email);
     DocumentSnapshot documentSnapshot = await documentReference.get();
     if (documentSnapshot.exists) {
       String firstName = documentSnapshot.get('firstName');
@@ -96,6 +117,8 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   @override
   void initState() {
     getFirstName();
+
+    timeSerie = TimeSerieModel(uid);
 
     accelerometerEvents.listen((AccelerometerEvent event) {
       xAcc = event.x;
@@ -133,14 +156,14 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                       setState(() {});
                       timer =
                           Timer.periodic(Duration(milliseconds: 50), (Timer t) {
-                        // timeSerie.addTimeDataModel(TimeDataModel.withAll(
-                        //     t: DateTime.now(),
-                        //     ax: xAcc,
-                        //     ay: yAcc,
-                        //     az: zAcc,
-                        //     gx: xGyr,
-                        //     gy: yGyr,
-                        //     gz: zGyr));
+                        timeSerie.addTimeDataModel(TimeDataModel.withAll(
+                            t: DateTime.now(),
+                            ax: xAcc,
+                            ay: yAcc,
+                            az: zAcc,
+                            gx: xGyr,
+                            gy: yGyr,
+                            gz: zGyr));
                         nbEntries++;
                       });
                     },

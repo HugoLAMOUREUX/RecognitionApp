@@ -77,13 +77,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 50,
               ),
               ElevatedButton(
-                onPressed: (() async {
-                  await _userService.logout();
-                  Navigator.pushAndRemoveUntil(
+                onPressed: (() {
+                  Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => DataCollectionScreen()),
-                      (route) => false);
+                          builder: (context) => DataCollectionScreen()));
                 }),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.fromLTRB(40, 15, 40, 15),
