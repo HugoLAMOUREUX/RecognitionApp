@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,11 +8,13 @@ import 'package:recognition/models/timeSerieModel.dart';
 import 'package:recognition/screens/Guest/Guest.dart';
 import 'package:recognition/screens/LabelizeScreen.dart';
 import 'package:recognition/services/UserService.dart';
-import 'package:recognition/widgets/timeSerieWidget.dart';
+import 'package:recognition/widgets/timeSerieChartWidget.dart';
+import 'package:recognition/widgets/dynamicTimeSeriesWidget.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
-import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+
 
 class DataCollectionScreen extends StatefulWidget {
   DataCollectionScreen({Key? key}) : super(key: key);
@@ -31,7 +32,8 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   double zGyr = 0.0;
   var timer;
 
-  late List<TimeDataModel> timeChartData;
+  late TimeSerieModel timeSerie;
+  late List<TimeDataModel> timeChartData=timeSerie.getTimeSerieModel();
 
   bool recording = false;
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -48,8 +50,14 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   int nbEntries = 0;
 
   //user data
-  late User user;
-  late String uid;
+  late  User user;
+  late  String uid;
+
+  List<StreamSubscription<dynamic>> _streamSubscriptions = <StreamSubscription<dynamic>>[];
+
+
+
+  final _controller=TimeSeriesUpdateController();
 
   //test test
   List<TimeDataModel> dataseries = [
@@ -86,27 +94,45 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   void initState() {
     getFirstName();
 
+
     timeSerie = TimeSerieModel(uid);
 
-    accelerometerEvents.listen((AccelerometerEvent event) {
-      xAcc = event.x;
-      yAcc = event.y;
-      zAcc = event.z;
-      //rebuild the widget
-      setState(() {});
-    });
+    _streamSubscriptions
+        .add(
+          accelerometerEvents.listen((AccelerometerEvent event) {
+            xAcc = event.x;
+            yAcc = event.y;
+            zAcc = event.z;
+            //rebuild the widget
+            setState(() {});
+          })
+        );
 
-    gyroscopeEvents.listen((GyroscopeEvent event) {
-      xGyr = event.x;
-      yGyr = event.y;
-      zGyr = event.z;
-      setState(() {});
-    });
+    _streamSubscriptions
+        .add(
+          gyroscopeEvents.listen((GyroscopeEvent event) {
+            xGyr = event.x;
+            yGyr = event.y;
+            zGyr = event.z;
+            setState(() {});
+          })
+        );
 
     // pour utiliser cloud firestore
     db = FirebaseFirestore.instance;
 
     super.initState();
+  }
+
+  @override
+  void dispose(){
+    _controller.dispose();
+
+    for (StreamSubscription<dynamic> subscription in _streamSubscriptions) {
+      subscription.cancel();
+    }
+
+    super.dispose();
   }
 
   @override
@@ -151,8 +177,7 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                   ? null
                   : () {
                       recording = false;
-                      print(recording);
-                      timeChartData = timeSerie.getTimeSerieModel();
+                      timeChartData=timeSerie.getTimeSerieModel();
 
                       setState(() {});
                       Fluttertoast.showToast(
@@ -162,21 +187,19 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                       timer.cancel();
                       nbEntries = 0;
 
-                      //pour utiliser firestore
-                      db
-                          .collection("timeSeries")
-                          .add(timeSerie.toListofMap())
-                          .then((DocumentReference doc) =>
-                              print('TimeSerie added with ID: ${doc.id}'));
-                      // Ajoute une nouvelle  timeseries avec un id généré
-                      print("sent on firestore");
-                      Navigator.pushAndRemoveUntil(
+                //pour utiliser firestore
+                db.collection("timeSeries").add(timeSerie.toMap()).then((DocumentReference doc) =>
+                    print('TimeSerie added with ID: ${doc.id}'));
+                // Ajoute une nouvelle  timeseries avec un id généré
+               
+                    Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
                                   LabelizeScreen(timeSerie: timeSerie)),
                           (route) => false);
-                    },
+              },
+                      
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5.0)),
@@ -188,48 +211,61 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                 style: TextStyle(color: Colors.white),
               ),
             ),
-            /*
-            // JE MET EN COMMENTAIRE PARCE QUE CA CREE DES WARNING
-            // JAI COMMENTE LA DEPENDANCE CORRESPONDANTE DANS PUBSPEC
-            // ET COMMENTE LA CLASSE TIMESERIEWIDGET
             Container(
-               child: TimeSerieChart.withSampleData(),
-               height: 300,
-             ),
-            //BOUTON TEST AJOUT DE POINT A LA SERIE
-            ElevatedButton(
-              onPressed: true ? _addPoint():null,
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0)),
-                padding: const EdgeInsets.symmetric(vertical: 15.0),
-                primary: Theme.of(context).primaryColor,
-              ),
-              child: Text(
-                'Add Point'.toUpperCase(),
-                style: TextStyle(color: Colors.white),
-              ),
-            )*/
+              height: 300,
+              child: DynamicTimeSeriesWidget(updateController: _controller, inputChartData: timeChartData)
+            ),
+            /*Container(
+              height: 200,
+              child: TimeSeriesChartWidget(),
+
+            ),
+
+             */
+            Container(
+              child: FutureBuilder<Map<String, dynamic>>(
+                  future: getDataFromFireStore(),
+                  builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+                    if (snapshot.hasData) {
+                      return Center( // here only return is missing
+                          child: Text(snapshot.data!["Activity"])
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      return Text('error $snapshot.data["Activity"]');
+                    }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: Text("waiting"),
+                      );
+                    }
+                    return Text("not catched");
+                  }
+    ),
+            height: 30,
+            ),
+
           ]),
         ),
       ),
     );
   }
 
-  /// Function to add new point to time series
-  _addPoint() {
-    this.dataseries.add(
-        TimeDataModel.withAcc(t: DateTime(2019, 3, 10), ax: 2, ay: 2, az: 2));
-    setState(() {});
-    Fluttertoast.showToast(
-      msg: 'point ajouté peut etre',
-      fontSize: 18,
+
+  Future<Map<String, dynamic>> getDataFromFireStore() async {
+
+    return await db.collection("timeSeries")
+        .doc("3LZLaKsGUSXZWgjySgZI")
+        .get()
+        .then(
+          (DocumentSnapshot doc) {
+        return doc.data() as Map<String, dynamic>;
+            //final data = doc.data() as Map<String, dynamic>;
+        //data["Activity"];
+      },
+      onError: (e) => print("Error getting document: $e"),
     );
-    return null;
   }
 
-  /// Sample time series data
-  List<TimeDataModel> _createData() {
-    return this.dataseries;
-  }
+
 }
