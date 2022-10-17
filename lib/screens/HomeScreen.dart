@@ -5,6 +5,10 @@ import 'package:recognition/screens/Guest/Guest.dart';
 import 'package:recognition/screens/dataCollectionScreen.dart';
 import 'package:recognition/services/UserService.dart';
 
+///Écran lancé après une connexion
+///
+///Il affiche un historique des activités enregistrés, permets d'enregistrer une nouvelle
+///activité, permets de se déconnecter et de modifier les paramètres(encore à coder)
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -13,23 +17,30 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  //Instance de FireBaseAuth pour le système d'authentification firebase
   final FirebaseAuth auth = FirebaseAuth.instance;
+  //Instance de FireBaseFirestore pour lea base de donnéees firebase
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
-  //user data
+
+  //Data du user connecté
   late User user;
   late String uid;
 
-  UserService _userService = UserService();
+  final UserService _userService = UserService();
 
-  void getFirstName() async {
-    //pour recup l'user authentifié //pourquoi final ? si on se deco reco ?
+  ///Fonction qui permets de récupérer les données de l'utilisateur connecté
+  void getUserData() async {
+    //Récupération de l'user authentifié
     final user = auth.currentUser;
-    //pour recup l'id de l'user authentifié // idem ?
+    //Récupération de l'id de l'utilisateur authentifié
     uid = user!.uid;
-    print(uid);
-    print(user.email);
 
-    //recup le firstName de l'user authentifié
+    //Avec l'authentification firebase, on peut récupérer les 2 données associées
+    //à un utilisateur qui sont l'uid et l'email de l'utilisateur
+    //print(uid);
+    //print(user.email);
+
+    //exemple: Récupération du firstName de l'user authentifié
     DocumentReference documentReference =
         _firebaseFirestore.collection('users').doc(user.email);
     DocumentSnapshot documentSnapshot = await documentReference.get();
@@ -39,12 +50,11 @@ class _HomeScreenState extends State<HomeScreen> {
       print(firstName);
       print("-----------------------");
     }
-    //firstName est recup mtn
   }
 
   @override
   void initState() {
-    getFirstName();
+    getUserData();
     super.initState();
   }
 
@@ -57,7 +67,9 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               ElevatedButton(
                 onPressed: (() async {
+                  //Déconnexion
                   await _userService.logout();
+                  //Retour à l'écran de connexion
                   Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(builder: (context) => GuestScreen()),
@@ -78,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               ElevatedButton(
                 onPressed: (() {
+                  //Passage à l'écran de collection de données
                   Navigator.push(
                       context,
                       MaterialPageRoute(

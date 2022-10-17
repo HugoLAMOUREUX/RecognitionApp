@@ -1,3 +1,4 @@
+///Classe contenant les données sur les labels
 class Labels {
   static List<Map> data = [
     {
