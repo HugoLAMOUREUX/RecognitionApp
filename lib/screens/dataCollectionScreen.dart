@@ -53,10 +53,13 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   late User user;
   late String uid;
 
-  List<StreamSubscription<dynamic>> _streamSubscriptions =
-      <StreamSubscription<dynamic>>[];
+  final List<StreamSubscription<dynamic>> _streamSubscriptions = <StreamSubscription<dynamic>>[];
+
 
   final _controller = TimeSeriesUpdateController();
+
+
+
 
   ///Fonction qui permets de récupérer les données de l'utilisateur connecté
   void getUserData() async {
@@ -125,6 +128,9 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          title: Text("Data Collection"),
+        ),
         body: Center(
           child: Column(children: [
             ElevatedButton(
@@ -137,7 +143,7 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                       timer =
                           Timer.periodic(Duration(milliseconds: 50), (Timer t) {
                         timeSerie.addTimeDataModel(TimeDataModel.withAll(
-                            t: DateTime.now(),
+                            t: DateTime.now().microsecondsSinceEpoch,
                             ax: xAcc,
                             ay: yAcc,
                             az: zAcc,
@@ -201,30 +207,8 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
               child: TimeSeriesChartWidget(),
 
             ),
-
+            ///https://stackoverflow.com/questions/70820040/how-can-i-display-a-logged-in-user-details-in-flutter do this !!!
              */
-            Container(
-              child: FutureBuilder<Map<String, dynamic>>(
-                  future: getDataFromFireStore(),
-                  builder:
-                      (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
-                    if (snapshot.hasData) {
-                      return Center(
-                          // here only return is missing
-                          child: Text(snapshot.data!["Activity"]));
-                    }
-                    if (snapshot.hasError) {
-                      return Text('error $snapshot.data["Activity"]');
-                    }
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: Text("waiting"),
-                      );
-                    }
-                    return Text("not catched");
-                  }),
-              height: 30,
-            ),
           ]),
         ),
       ),
@@ -232,9 +216,10 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   }
 
   Future<Map<String, dynamic>> getDataFromFireStore() async {
+
     return await _firebaseFirestore
         .collection("timeSeries")
-        .doc("3LZLaKsGUSXZWgjySgZI")
+        .doc("K1BB7JQSAZnU9i0d9rv0")
         .get()
         .then(
       (DocumentSnapshot doc) {
@@ -246,3 +231,41 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
     );
   }
 }
+
+
+/* EXEMPLE AVEC FUTURE BUILDER
+Container(
+              height: 200,
+              child: FutureBuilder<Map<String, dynamic>>(
+                  future: getDataFromFireStore(),
+                  builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+                    if (snapshot.hasData) {
+                      return Center( // here only return is missing
+                          child: TimeSeriesChartWidget(seriesdata:snapshot.data!["TimeSerie"].map<TimeDataModel>((data) {
+                            return TimeDataModel.withAll(
+                                t: data['t'],
+                                ax: data['ax'],
+                                ay: data['ay'],
+                                az: data['az'],
+                                gx: data['gx'],
+                                gy: data['gy'],
+                                gz: data['gz']
+                            );
+                          }
+                      ).toList()
+                          )
+                          );
+                    }
+                    if (snapshot.hasError) {
+                      return Text('error $snapshot.data["Activity"]');
+                    }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: Text("waiting"),
+                      );
+                    }
+                    return const Text("not catched");
+                  }
+    ),
+            )
+ */

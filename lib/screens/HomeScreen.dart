@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:recognition/screens/Guest/Guest.dart';
+import 'package:recognition/widgets/userHistoryWidget.dart';
 import 'package:recognition/screens/dataCollectionScreen.dart';
 import 'package:recognition/services/UserService.dart';
 
@@ -62,10 +63,28 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false, //pour cacher la flèche arrière
+          title: Text("Welcome user.displayName"), //en attendant de trouver un moyen d'afficher le displayname
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.logout),
+              tooltip: 'Logout',
+              onPressed: (() async {
+                await _userService.logout();
+                ///TROUVER UNE SOLLUTION AU PROBLEME : Do not use BuildContexts across async gaps.
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => GuestScreen()),
+                        (route) => false);
+              }),
+            )
+          ],
+        ),
         body: Center(
           child: Column(
             children: [
-              ElevatedButton(
+          /*    ElevatedButton(
                 onPressed: (() async {
                   //Déconnexion
                   await _userService.logout();
@@ -84,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
+              ),*/
               const SizedBox(
                 height: 50,
               ),
@@ -106,6 +125,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+              const SizedBox(
+                height: 50,
+              ),
+              UserHistoryWidget()
+
             ],
           ),
         ),

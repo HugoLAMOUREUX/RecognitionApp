@@ -30,16 +30,18 @@ class TimeSerieModel {
     List<Map<String, dynamic>> timedata =
         []; // pour envoyer une liste de timedatamodel
     ///Map<String,dynamic> timedata={}; //pour envoyer un json des timestamps
-    res["Owner"] = this.owner;
+
+    res["Owner"]=owner;
     res["Activity"] = type;
 
-    for (TimeDataModel d in timeSerie) {
-      DateTime time = d.t;
+    for(TimeDataModel d in timeSerie){
+      int time=d.t;
 
       ///timedata["$time"]=d.toSensorsMap(); // pour ajouter une map des sensor values dans le clé timestamp
 
       timedata.add(d.toMap()); // pour ajouter une map de timedatamodel
     }
+
     res["TimeSerie"] = timedata;
     return res;
   }
