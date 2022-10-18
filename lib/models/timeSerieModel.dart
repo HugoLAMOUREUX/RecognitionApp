@@ -1,11 +1,16 @@
 import 'dart:ffi';
 
+
 import 'package:recognition/models/timeDataModel.dart';
+
+
 
 class TimeSerieModel {
   late List<TimeDataModel> timeSerie;
   late String owner;
-  //intégrer owner et activity a model timeserie ? créer un autre model ?
+  late DateTime date;
+  late int duration;
+
 
   TimeSerieModel(this.owner) {
     timeSerie = [];
@@ -33,16 +38,29 @@ class TimeSerieModel {
 
     res["Owner"]=owner;
     res["Activity"] = type;
+    res["Date"]=date;
+    res["Duration"]=duration;
 
     for(TimeDataModel d in timeSerie){
       int time=d.t;
 
       ///timedata["$time"]=d.toSensorsMap(); // pour ajouter une map des sensor values dans le clé timestamp
-
       timedata.add(d.toMap()); // pour ajouter une map de timedatamodel
     }
 
     res["TimeSerie"] = timedata;
     return res;
   }
+
+  void setTime(DateTime startTime) {
+      date=startTime;
+  }
+
+  int setDuration(DateTime endTime){
+    Duration delta=endTime.difference(date);
+    duration=delta.inSeconds;
+    return duration;
+  }
+
+
 }

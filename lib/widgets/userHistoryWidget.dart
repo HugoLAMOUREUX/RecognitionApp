@@ -30,7 +30,15 @@ class _UserHistoryWidgetState extends State<UserHistoryWidget> {
                 child: CircularProgressIndicator(),
               );
             }
-
+            if(snapshot.data!.docs.isEmpty){
+              return Center(
+                child: Column(
+                    children:[
+                      Icon(Icons.hourglass_empty_outlined,size: 40,),
+                      Text("No Reccordings to display")
+                    ]),
+              );
+            }
             return ListView(
               children: snapshot.data!.docs.map((document){
                 List<TimeDataModel> timeSerieRecording=document["TimeSerie"].map<TimeDataModel>((data) {
@@ -46,7 +54,8 @@ class _UserHistoryWidgetState extends State<UserHistoryWidget> {
                 }
                 ).toList();
                 return Center(
-                  child: SingleRecordingItem(owner:document["Owner"],activity:document["Activity"],timeSerie:timeSerieRecording),
+
+                  child: SingleRecordingItem(owner:document["Owner"],activity:document["Activity"],date:(document["Date"] as Timestamp).toDate().toString(),duration: document["Duration"],timeSerie:timeSerieRecording),
                 );
               }).toList(),
             );
@@ -55,7 +64,6 @@ class _UserHistoryWidgetState extends State<UserHistoryWidget> {
     );
   }
 }
-
 
 /*
 ListView.builder(

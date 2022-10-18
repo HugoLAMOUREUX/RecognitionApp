@@ -139,6 +139,7 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                   : () {
                       recording = true;
                       setState(() {});
+                      timeSerie.setTime(DateTime.now());
                       //on ajoute une donnée toute les 50ms
                       timer =
                           Timer.periodic(Duration(milliseconds: 50), (Timer t) {
@@ -169,11 +170,12 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                   ? null
                   : () {
                       recording = false;
-                      timeChartData = timeSerie.getTimeSerieModel();
+                      timeChartData = timeSerie.getTimeSerieModel(); //a enlever ?
+                      int duration=timeSerie.setDuration(DateTime.now());
 
                       setState(() {});
                       Fluttertoast.showToast(
-                        msg: 'Recording ended with $nbEntries entries',
+                        msg: 'Recording ended with $nbEntries entries and $duration seconds',
                         fontSize: 18,
                       );
                       timer.cancel();
