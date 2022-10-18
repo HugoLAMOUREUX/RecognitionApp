@@ -1,29 +1,32 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:recognition/models/timeDataModel.dart';
+import 'package:recognition/widgets/smallText.dart';
 import 'package:recognition/widgets/timeSerieChartWidget.dart';
 
 class SingleRecordingItem extends StatelessWidget {
 
 
-  const SingleRecordingItem( {Key? key, required this.owner, required this.activity, required this.timeSerie}) : super(key: key);
+  const SingleRecordingItem( {Key? key, required this.owner, required this.activity,required this.date, required this.duration, required this.timeSerie}) : super(key: key);
 
-  final List<TimeDataModel> timeSerie;
   final String owner;
   final String activity;
+  final String date;
+  final int duration;
+  final List<TimeDataModel> timeSerie;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 150,
       margin: const EdgeInsets.only(left: 24,right: 24,top: 10,bottom: 10),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10)),
           boxShadow: [
             BoxShadow(
               color: Colors.black12,
-              offset: const Offset(
+              offset: Offset(
                 0.0,
                 0.0,
               ),
@@ -48,9 +51,9 @@ class SingleRecordingItem extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("duree : 22s"),
-                  Text("data : date"),
-                  Text("activity : $activity"),
+                  SmallText(text:"duree : ${duration}s"),
+                  SmallText(text:"date : ${date}",maxLength: 23),
+                  SmallText(text:"activity : ${activity}",maxLength: 19,),
                 ],
               ),
             ),
