@@ -130,6 +130,9 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          title: Text("Data Collection"),
+        ),
         body: Center(
           child: Column(children: [
             ElevatedButton(
@@ -211,42 +214,8 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
               child: TimeSeriesChartWidget(),
 
             ),
-
+            ///https://stackoverflow.com/questions/70820040/how-can-i-display-a-logged-in-user-details-in-flutter do this !!!
              */
-            Container(
-              height: 200,
-              child: FutureBuilder<Map<String, dynamic>>(
-                  future: getDataFromFireStore(),
-                  builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
-                    if (snapshot.hasData) {
-                      return Center( // here only return is missing
-                          child: TimeSeriesChartWidget(snapshot.data!["TimeSerie"].map<TimeDataModel>((data) {
-                            return TimeDataModel.withAll(
-                                t: data['t'],
-                                ax: data['ax'],
-                                ay: data['ay'],
-                                az: data['az'],
-                                gx: data['gx'],
-                                gy: data['gy'],
-                                gz: data['gz']
-                            );
-                          }
-                      ).toList()
-                          )
-                          );
-                    }
-                    if (snapshot.hasError) {
-                      return Text('error $snapshot.data["Activity"]');
-                    }
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: Text("waiting"),
-                      );
-                    }
-                    return const Text("not catched");
-                  }
-    ),
-            ),
 
           ]),
         ),
@@ -272,3 +241,41 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
 
 
 }
+
+
+/* EXEMPLE AVEC FUTURE BUILDER
+Container(
+              height: 200,
+              child: FutureBuilder<Map<String, dynamic>>(
+                  future: getDataFromFireStore(),
+                  builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+                    if (snapshot.hasData) {
+                      return Center( // here only return is missing
+                          child: TimeSeriesChartWidget(seriesdata:snapshot.data!["TimeSerie"].map<TimeDataModel>((data) {
+                            return TimeDataModel.withAll(
+                                t: data['t'],
+                                ax: data['ax'],
+                                ay: data['ay'],
+                                az: data['az'],
+                                gx: data['gx'],
+                                gy: data['gy'],
+                                gz: data['gz']
+                            );
+                          }
+                      ).toList()
+                          )
+                          );
+                    }
+                    if (snapshot.hasError) {
+                      return Text('error $snapshot.data["Activity"]');
+                    }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: Text("waiting"),
+                      );
+                    }
+                    return const Text("not catched");
+                  }
+    ),
+            )
+ */

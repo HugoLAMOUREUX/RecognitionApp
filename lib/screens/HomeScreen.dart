@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:recognition/screens/Guest/Guest.dart';
-import 'package:recognition/widgets/UserHistoryWidget.dart';
+import 'package:recognition/widgets/userHistoryWidget.dart';
 import 'package:recognition/screens/dataCollectionScreen.dart';
 import 'package:recognition/services/UserService.dart';
 

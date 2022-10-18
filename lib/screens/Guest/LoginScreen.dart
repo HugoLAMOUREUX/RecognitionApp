@@ -120,10 +120,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             ))
                                 .then((value) {
                               if (value != "" && value != null) {
-                                Navigator.push(
+                                Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => HomeScreen()));
+                                        builder: (context) => HomeScreen()),
+                                    (route)=>false);
                               }
                             });
                           }
