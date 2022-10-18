@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:recognition/models/timeSerieModel.dart';
 import 'package:recognition/screens/HomeScreen.dart';
@@ -15,6 +16,7 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
   //pour recuprer la donnée passé : widget.timeSerie
   List<Map> staticData = Labels.data;
   int selectedIndex = 0;
+  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
   Widget _buildSelectIcon(bool isSelected, Map data) {
     return Icon(
@@ -23,10 +25,11 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
     );
   }
 
+  ///Mets à jour l'index selectionné quand on clique sur un label
   void onTap(bool isSelected, int index) {
     setState(() {
       selectedIndex = index;
-      print(widget.timeSerie);
+      //print(widget.timeSerie);
     });
   }
 
@@ -55,6 +58,14 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
             ),
             ElevatedButton(
               onPressed: () {
+                // Ajoute une nouvelle  timeseries avec un id généré sur firestore
+                _firebaseFirestore
+                    .collection("timeSeries")
+                    .add(widget.timeSerie
+                        .toMap(staticData[selectedIndex]["name"]))
+                    .then((DocumentReference doc) =>
+                        print('TimeSerie added with ID: ${doc.id}'));
+                // Revient à la page HomeScreen
                 Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (context) => HomeScreen()),
