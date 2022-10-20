@@ -1,12 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:recognition/models/timeSerieModel.dart';
 import 'package:recognition/screens/HomeScreen.dart';
 import 'package:recognition/screens/Labels.dart';
 
+import '../models/timeDataModel.dart';
+import '../widgets/edited_time_series_widget.dart';
+
 class LabelizeScreen extends StatefulWidget {
   final TimeSerieModel timeSerie;
-  const LabelizeScreen({super.key, required TimeSerieModel this.timeSerie});
+  const LabelizeScreen({super.key, required this.timeSerie});
 
   @override
   State<LabelizeScreen> createState() => _LabelizeScreenState();
@@ -17,7 +21,13 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
   List<Map> staticData = Labels.data;
   int selectedIndex = 0;
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  final _secondController = TimeSeriesEditorController();
 
+  @override
+  void dispose(){
+    _secondController.dispose();
+    super.dispose();
+}
   Widget _buildSelectIcon(bool isSelected, Map data) {
     return Icon(
       isSelected ? Icons.check_box : Icons.check_box_outline_blank,
@@ -37,53 +47,155 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Center(
-            child: Column(
-          children: [
-            SizedBox(
-              height: 400,
-              width: double.infinity,
-              child: ListView.builder(
-                itemBuilder: (builder, index) {
-                  Map data = staticData[index];
-                  bool isSelected = index == selectedIndex;
-                  return ListTile(
-                    onTap: () => onTap(isSelected, index),
-                    title: Text("${data['name']}"),
-                    leading: _buildSelectIcon(isSelected, data), // updated
-                  );
+        body: SingleChildScrollView(
+          child: Center(
+              child: Column(
+            children: [
+
+              simpleTimeSerieBuilder(),
+              Row(
+                mainAxisAlignment:MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  SizedBox(
+                    width: 100,
+                      child:TextField(
+                    decoration: const InputDecoration(labelText: "Crop start"),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    onChanged: (text){
+                      //if text non vide
+                      //ALSO CHECK PLUS TARD SI INT PAS TROP GRAND ?
+                      if(text.isNotEmpty) {
+                        _secondController.updateStart(int.parse(text));
+                      }
+                    },// Only numbers can be entered
+                  )),
+                  SizedBox(
+                      width: 100,
+                    child:TextField(
+                    decoration: const InputDecoration(labelText: "Crop end"),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    onChanged: (text){
+                      if(text.isNotEmpty) {
+                        _secondController.updateEnd(int.parse(text));
+                      }
+                    },// Only numbers can be entered
+                  )
+                  )
+                ],),
+
+              SizedBox(
+                height: 400,
+                width: double.infinity,
+                child: ListView.builder(
+                  itemBuilder: (builder, index) {
+                    Map data = staticData[index];
+                    bool isSelected = index == selectedIndex;
+                    return ListTile(
+                      onTap: () => onTap(isSelected, index),
+                      title: Text("${data['name']}"),
+                      leading: _buildSelectIcon(isSelected, data), // updated
+                    );
+                  },
+                  itemCount: staticData.length,
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // Ajoute une nouvelle  timeseries avec un id généré sur firestore
+                  _firebaseFirestore
+                      .collection("timeSeries")
+                      .add(widget.timeSerie
+                          .toMap(staticData[selectedIndex]["name"]))
+                      .then((DocumentReference doc) =>
+                          print('TimeSerie added with ID: ${doc.id}'));
+                  // Revient à la page HomeScreen
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HomeScreen()),
+                      (route) => false);
                 },
-                itemCount: staticData.length,
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5.0)),
+                  padding: const EdgeInsets.symmetric(vertical: 15.0),
+                  primary: Theme.of(context).primaryColor,
+                ),
+                child: Text(
+                  'SEND'.toUpperCase(),
+                  style: const TextStyle(color: Colors.white),
+                ),
               ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // Ajoute une nouvelle  timeseries avec un id généré sur firestore
-                _firebaseFirestore
-                    .collection("timeSeries")
-                    .add(widget.timeSerie
-                        .toMap(staticData[selectedIndex]["name"]))
-                    .then((DocumentReference doc) =>
-                        print('TimeSerie added with ID: ${doc.id}'));
-                // Revient à la page HomeScreen
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomeScreen()),
-                    (route) => false);
-              },
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0)),
-                padding: const EdgeInsets.symmetric(vertical: 15.0),
-                primary: Theme.of(context).primaryColor,
-              ),
-              child: Text(
-                'SEND'.toUpperCase(),
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        )),
+            ],
+          )),
+        ),
+      ),
+    );
+  }
+
+  Future<Map<String, dynamic>> getDataFromFireStore() async {
+
+    return await _firebaseFirestore
+        .collection("timeSeries")
+        .doc("5oi0j4Eu9yJn84YOR6Cv")
+        .get()
+        .then(
+          (DocumentSnapshot doc) {
+        return doc.data() as Map<String, dynamic>;
+        //final data = doc.data() as Map<String, dynamic>;
+        //data["Activity"];
+      },
+      onError: (e) => print("Error getting document: $e"),
+    );
+  }
+
+  Widget simpleTimeSerieBuilder(){
+    return Container(
+      height: 300,
+        child: Center(
+          child:EditedTimeSeriesWidget(inputChartData: widget.timeSerie.getTimeSerieModel(),editorController: _secondController)
+    )
+    );
+  }
+
+  Widget timeSerieBuilder(){
+    return Container(
+      height: 300,
+      child: FutureBuilder<Map<String, dynamic>>(
+          future: getDataFromFireStore(),
+          builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+            if (snapshot.hasData) {
+              return Center( // here only return is missing
+                  child: EditedTimeSeriesWidget(inputChartData:snapshot.data!["TimeSerie"].map<TimeDataModel>((data) {
+                    return TimeDataModel.withAll(
+                        t: data['t'],
+                        ax: data['ax'],
+                        ay: data['ay'],
+                        az: data['az'],
+                        gx: data['gx'],
+                        gy: data['gy'],
+                        gz: data['gz']
+                    );
+                  }
+                  ).toList(), editorController: _secondController,
+                  )
+              );
+            }
+            if (snapshot.hasError) {
+              return Text('error $snapshot.data["Activity"]');
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: Text("waiting"),
+              );
+            }
+            return const Text("not catched");
+          }
       ),
     );
   }
