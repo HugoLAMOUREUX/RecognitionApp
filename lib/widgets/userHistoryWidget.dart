@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:recognition/widgets/singleRecordingItem.dart';
 
@@ -22,17 +22,17 @@ class _UserHistoryWidgetState extends State<UserHistoryWidget> {
         child: StreamBuilder(
       stream: widget._firebaseFirestore
           .collection("timeSeries")
-          .where("Owner", isEqualTo: "rGKoKryATbft1dbNr48VP89NGyt1")
+          .where("Owner", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         }
         if (snapshot.data!.docs.isEmpty) {
           return Center(
-            child: Column(children: [
+            child: Column(children: const [
               Icon(
                 Icons.hourglass_empty_outlined,
                 size: 40,

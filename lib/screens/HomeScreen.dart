@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:recognition/screens/DownloadScreen.dart';
 import 'package:recognition/screens/Guest/Guest.dart';
 import 'package:recognition/widgets/userHistoryWidget.dart';
 import 'package:recognition/screens/dataCollectionScreen.dart';
@@ -26,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   //Data du user connecté
   late User user;
   late String uid;
+  String firstName = "";
 
   final UserService _userService = UserService();
 
@@ -46,7 +48,9 @@ class _HomeScreenState extends State<HomeScreen> {
         _firebaseFirestore.collection('users').doc(user.email);
     DocumentSnapshot documentSnapshot = await documentReference.get();
     if (documentSnapshot.exists) {
-      String firstName = documentSnapshot.get('firstName');
+      setState(() {
+        firstName = documentSnapshot.get('firstName');
+      });
       print("-----------------------");
       print(firstName);
       print("-----------------------");
@@ -65,18 +69,21 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false, //pour cacher la flèche arrière
-          title: Text("Welcome user.displayName"), //en attendant de trouver un moyen d'afficher le displayname
+          title: Text(
+              "Welcome $firstName"), //en attendant de trouver un moyen d'afficher le displayname
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.logout),
               tooltip: 'Logout',
               onPressed: (() async {
                 await _userService.logout();
+
                 ///TROUVER UNE SOLLUTION AU PROBLEME : Do not use BuildContexts across async gaps.
                 Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => GuestScreen()),
-                        (route) => false);
+                    MaterialPageRoute(
+                        builder: (context) => const GuestScreen()),
+                    (route) => false);
               }),
             )
           ],
@@ -84,26 +91,6 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Center(
           child: Column(
             children: [
-          /*    ElevatedButton(
-                onPressed: (() async {
-                  //Déconnexion
-                  await _userService.logout();
-                  //Retour à l'écran de connexion
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => GuestScreen()),
-                      (route) => false);
-                }),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.fromLTRB(40, 15, 40, 15),
-                ),
-                child: const Text(
-                  'Logout',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),*/
               const SizedBox(
                 height: 50,
               ),
@@ -128,8 +115,28 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(
                 height: 50,
               ),
+              ElevatedButton(
+                onPressed: (() {
+                  //Passage à l'écran de collection de données
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DownloadScreen()));
+                }),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.fromLTRB(40, 15, 40, 15),
+                ),
+                child: const Text(
+                  'Download data sets',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 50,
+              ),
               UserHistoryWidget()
-
             ],
           ),
         ),
