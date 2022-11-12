@@ -45,7 +45,7 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Text(
-                  "Please select the activity you've just did",
+                  "Please select the activity you've just done",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontStyle: FontStyle.italic,
