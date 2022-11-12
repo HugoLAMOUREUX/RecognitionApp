@@ -107,6 +107,23 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              print('Forgotted Password!');
+                            },
+                            child: Text(
+                              'Forgot Password?',
+                              style: TextStyle(
+                                color: Colors.black.withOpacity(0.4),
+                                fontSize: 12.0,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(
                         height: 20,
                       ),
@@ -124,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => HomeScreen()),
-                                    (route)=>false);
+                                    (route) => false);
                               }
                             });
                           }

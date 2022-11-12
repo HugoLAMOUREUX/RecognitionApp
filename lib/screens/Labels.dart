@@ -3,27 +3,27 @@ class Labels {
   static List<Map> data = [
     {
       "id": 1,
-      "name": "Marche",
+      "name": "Walking",
     },
     {
       "id": 2,
-      "name": "Course",
+      "name": "Runing",
     },
     {
       "id": 3,
-      "name": "Monter les escaliers",
+      "name": "Climbing stairs",
     },
     {
       "id": 4,
-      "name": "Descendre les escaliers",
+      "name": "Going down the stairs",
     },
     {
       "id": 5,
-      "name": "S'asseoir",
+      "name": "Sitting",
     },
     {
       "id": 6,
-      "name": "Rester debout",
+      "name": "Standing",
     }
   ];
 }
