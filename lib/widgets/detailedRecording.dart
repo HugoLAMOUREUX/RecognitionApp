@@ -67,7 +67,7 @@ class DetailedRecording extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Duration : ${duration}s",style: TextStyle(fontSize: 18)),
+                      Text("Duration : ${duration} seconds",style: TextStyle(fontSize: 18)),
                       Text("Date : ${date.substring(0,16)}",style: TextStyle(fontSize: 18)),
                       Text("Activity : ${activity}",style: TextStyle(fontSize: 18)),
                     ],

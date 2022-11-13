@@ -52,38 +52,46 @@ class _RecapScreenState extends State<RecapScreen> {
                   duration: widget.timeSerie.getDuration(),
                   timeSerie: widget.timeSerie.getTimeSerieModel()
               ),
-              IconButton(
-                icon: Icon(Icons.edit),
-                color: Colors.blue,
-                onPressed: () {},
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  // Ajoute une nouvelle  timeseries avec un id généré sur firestore
-                  _firebaseFirestore
-                      .collection("timeSeries")
-                      .add(widget.timeSerie.toMap())
-                      .then((DocumentReference doc) =>
+              SizedBox(height: 30,width: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.edit),
+                    color: Colors.blue,
+                    onPressed: () {},
+                  ),
+                  SizedBox(height: 30,width: 40),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Ajoute une nouvelle  timeseries avec un id généré sur firestore
+                      _firebaseFirestore
+                          .collection("timeSeries")
+                          .add(widget.timeSerie.toMap())
+                          .then((DocumentReference doc) =>
                           print('TimeSerie added with ID: ${doc.id}'));
-                  // Revient à la page HomeScreen
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const HomeScreen()),
-                      (route) => false);
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5.0)),
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 15.0, horizontal: 10.0),
-                  primary: Theme.of(context).primaryColor,
-                ),
-                child: Text(
-                  'Send'.toUpperCase(),
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
+                      // Revient à la page HomeScreen
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const HomeScreen()),
+                              (route) => false);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.0)),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15.0, horizontal: 10.0),
+                      primary: Theme.of(context).primaryColor,
+                    ),
+                    child: Text(
+                      'Send'.toUpperCase(),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  )
+                ],
+              )
+
             ],
           ),
         ),
