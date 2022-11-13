@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:recognition/models/timeSerieModel.dart';
 import 'package:recognition/screens/HomeScreen.dart';
 import 'package:recognition/screens/Labels.dart';
+import 'package:recognition/screens/RecapScreen.dart';
+import 'package:recognition/widgets/timeSerieChartWidget.dart';
 
 import '../models/timeDataModel.dart';
 import '../widgets/edited_time_series_widget.dart';
@@ -20,7 +22,6 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
   //pour recuprer la donnée passé : widget.timeSerie
   List<Map> staticData = Labels.data;
   int selectedIndex = 0;
-  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
   Widget _buildSelectIcon(bool isSelected, Map data) {
     return Icon(
@@ -41,6 +42,7 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+
         appBar: AppBar(
           title: Text("Time serie details"),
         ),
@@ -48,7 +50,19 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
           child: Center(
               child: Column(
             children: [
-
+              const Center(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Text(
+                  "Please select the activity you've just done",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
+                    fontSize: 25,
+                  ),
+                ),
+              ),
+            ),
               SizedBox(
                 height: 400,
                 width: double.infinity,
@@ -66,36 +80,35 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
                 ),
               ),
               ElevatedButton(
-                onPressed: () {
-                  // Ajoute une nouvelle  timeseries avec un id généré sur firestore
-                  _firebaseFirestore
-                      .collection("timeSeries")
-                      .add(widget.timeSerie
-                          .toMap(staticData[selectedIndex]["name"]))
-                      .then((DocumentReference doc) =>
-                          print('TimeSerie added with ID: ${doc.id}'));
-                  // Revient à la page HomeScreen
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HomeScreen()),
-                      (route) => false);
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5.0)),
-                  padding: const EdgeInsets.symmetric(vertical: 15.0),
-                  primary: Theme.of(context).primaryColor,
-                ),
-                child: Text(
-                  'SEND'.toUpperCase(),
-                  style: const TextStyle(color: Colors.white),
-                ),
+              onPressed: () {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => RecapScreen(
+                              timeSerie: widget.timeSerie.setActivity(
+                                  staticData[selectedIndex]["name"]),
+                            )),
+                    (route) => false);
+              },
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0)),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 15.0, horizontal: 10.0),
+                primary: Theme.of(context).primaryColor,
               ),
-            ],
-          )),
-        ),
-      ),
-    );
+              child: Text(
+                'Continue'.toUpperCase(),
+                style: const TextStyle(color: Colors.white),
+                ),
+                
+              ), //button ?
+            ], //children ?
+          )//column ?
+         ), //center ?
+        ), //SingleChildScrollView ?
+      ), //Scaffold ?
+    ); //SafeArea
   }
 
   /*
