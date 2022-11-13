@@ -42,9 +42,9 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-
         appBar: AppBar(
-          title: Text("Time serie details"),
+          automaticallyImplyLeading: false, //pour cacher la flèche arrière
+          title: Text("Time Series Details"),
         ),
         body: SingleChildScrollView(
           child: Center(
@@ -54,7 +54,7 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Text(
-                  "Please select the activity you've just done",
+                  "Please select the activity you have just done",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontStyle: FontStyle.italic,
@@ -102,13 +102,13 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
                 style: const TextStyle(color: Colors.white),
                 ),
                 
-              ), //button ?
-            ], //children ?
-          )//column ?
-         ), //center ?
-        ), //SingleChildScrollView ?
-      ), //Scaffold ?
-    ); //SafeArea
+              ),
+            ],
+          )
+         ),
+        ),
+      ),
+    );
   }
 
   /*

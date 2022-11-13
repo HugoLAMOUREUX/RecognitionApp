@@ -75,6 +75,7 @@ class SingleRecordingItem extends StatelessWidget {
               ),
             )
           ],
-        ));
+        )
+    );
   }
 }

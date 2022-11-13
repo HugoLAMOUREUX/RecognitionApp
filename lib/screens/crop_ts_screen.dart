@@ -53,6 +53,10 @@ class _CropTsScreenState extends State<CropTsScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+            automaticallyImplyLeading: false, //pour cacher la flèche arrière
+            title: Text("Time Series Details")
+        ),
         body:SingleChildScrollView(
           child: Column(
 

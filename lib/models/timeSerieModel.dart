@@ -6,7 +6,7 @@ class TimeSerieModel {
   late DateTime date;
   late int duration;
   
-  late String activity;//pullrequestmodif
+  late String activity;
 
 
   TimeSerieModel.copy(TimeSerieModel ts){
@@ -14,8 +14,11 @@ class TimeSerieModel {
     owner=ts.owner;
     date=ts.date;
     duration=ts.duration;
-   
-    activity=ts.activity; //pullrequestmodif
+
+    /*
+    activity=ts.activity;
+    faudrait check si ts.activity est null ou pas
+     */
   }
 
 
