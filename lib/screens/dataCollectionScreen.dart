@@ -6,8 +6,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recognition/models/timeDataModel.dart';
 import 'package:recognition/models/timeSerieModel.dart';
 import 'package:recognition/screens/LabelizeScreen.dart';
+import 'package:recognition/screens/crop_ts_screen.dart';
 import 'package:recognition/services/UserService.dart';
-import 'package:recognition/widgets/timeSerieChartWidget.dart';
 import 'package:recognition/widgets/dynamicTimeSeriesWidget.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
@@ -57,6 +57,7 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
 
 
   final _controller = TimeSeriesUpdateController();
+
 
 
 
@@ -117,6 +118,7 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   void dispose() {
     _controller.dispose();
 
+
     for (StreamSubscription<dynamic> subscription in _streamSubscriptions) {
       subscription.cancel();
     }
@@ -132,83 +134,95 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
           title: Text("Data Collection"),
         ),
         body: Center(
-          child: Column(children: [
-            ElevatedButton(
-              onPressed: recording
-                  ? null
-                  : () {
-                      recording = true;
-                      setState(() {});
-                      timeSerie.setTime(DateTime.now());
-                      //on ajoute une donnée toute les 50ms
-                      timer =
-                          Timer.periodic(Duration(milliseconds: 50), (Timer t) {
-                        timeSerie.addTimeDataModel(TimeDataModel.withAll(
-                            t: DateTime.now().microsecondsSinceEpoch,
-                            ax: xAcc,
-                            ay: yAcc,
-                            az: zAcc,
-                            gx: xGyr,
-                            gy: yGyr,
-                            gz: zGyr));
-                        nbEntries++;
-                      });
-                    },
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0)),
-                padding: const EdgeInsets.symmetric(vertical: 15.0),
-                primary: Theme.of(context).primaryColor,
-              ),
-              child: Text(
-                'Record'.toUpperCase(),
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: !recording
-                  ? null
-                  : () {
-                      recording = false;
-                      timeChartData = timeSerie.getTimeSerieModel(); //a enlever ?
-                      int duration=timeSerie.setDuration(DateTime.now());
-
-                      setState(() {});
-                      Fluttertoast.showToast(
-                        msg: 'Recording ended with $nbEntries entries and $duration seconds',
-                        fontSize: 18,
-                      );
-                      timer.cancel();
-                      nbEntries = 0;
-                      //On va au screen pour sélectioner le label et on passe timeSerie en paramètre pour pourvoir ensuite l'envoyer
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  LabelizeScreen(timeSerie: timeSerie)),
-                          (route) => false);
-                    },
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0)),
-                padding: const EdgeInsets.symmetric(vertical: 15.0),
-                primary: Theme.of(context).primaryColor,
-              ),
-              child: Text(
-                'STOP'.toUpperCase(),
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
             Container(
                 height: 300,
                 child: DynamicTimeSeriesWidget(
                     updateController: _controller,
-                    inputChartData: timeChartData)),
-            /*Container(
-              height: 200,
-              child: TimeSeriesChartWidget(),
-
+                    inputChartData: timeChartData)
             ),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: recording
+                      ? null
+                      : () {
+                    recording = true;
+                    setState(() {});
+                    timeSerie.setTime(DateTime.now());
+                    //on ajoute une donnée toute les 50ms
+                    timer =
+                        Timer.periodic(Duration(milliseconds: 50), (Timer t) {
+                          timeSerie.addTimeDataModel(TimeDataModel.withAll(
+                              t: DateTime.now().microsecondsSinceEpoch,
+                              ax: xAcc,
+                              ay: yAcc,
+                              az: zAcc,
+                              gx: xGyr,
+                              gy: yGyr,
+                              gz: zGyr));
+                          nbEntries++;
+                        });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0)),
+                    minimumSize: Size(140, 60),
+                    padding: const EdgeInsets.symmetric(vertical: 15.0,horizontal: 20),
+                    primary: Theme.of(context).primaryColor,
+                  ),
+                  child: Text(
+                    'Record'.toUpperCase(),
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: !recording
+                      ? null
+                      : () {
+                    recording = false;
+                    timeChartData = timeSerie.getTimeSerieModel(); //a enlever ?
+                    int duration=timeSerie.setDuration(DateTime.now());
+
+                    setState(() {});
+                    Fluttertoast.showToast(
+                      msg: 'Recording ended with $nbEntries entries and $duration seconds',
+                      fontSize: 18,
+                    );
+                    timer.cancel();
+                    nbEntries = 0;
+                    //On va au screen pour sélectioner le label et on passe timeSerie en paramètre pour pourvoir ensuite l'envoyer
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                CropTsScreen(timeSerie: timeSerie)),
+                            (route) => route.isFirst);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0)
+                    ),
+                    minimumSize: Size(140, 60),
+                    padding: const EdgeInsets.symmetric(vertical: 15.0,horizontal: 20),
+                    primary: Theme.of(context).primaryColor,
+                  ),
+                  child: Text(
+                    'STOP'.toUpperCase(),
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+
+              ],
+            )
+
+
+
+            /*
             ///https://stackoverflow.com/questions/70820040/how-can-i-display-a-logged-in-user-details-in-flutter do this !!!
              */
           ]),
@@ -217,57 +231,9 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
     );
   }
 
-  Future<Map<String, dynamic>> getDataFromFireStore() async {
 
-    return await _firebaseFirestore
-        .collection("timeSeries")
-        .doc("K1BB7JQSAZnU9i0d9rv0")
-        .get()
-        .then(
-      (DocumentSnapshot doc) {
-        return doc.data() as Map<String, dynamic>;
-        //final data = doc.data() as Map<String, dynamic>;
-        //data["Activity"];
-      },
-      onError: (e) => print("Error getting document: $e"),
-    );
-  }
+
 }
 
 
-/* EXEMPLE AVEC FUTURE BUILDER
-Container(
-              height: 200,
-              child: FutureBuilder<Map<String, dynamic>>(
-                  future: getDataFromFireStore(),
-                  builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
-                    if (snapshot.hasData) {
-                      return Center( // here only return is missing
-                          child: TimeSeriesChartWidget(seriesdata:snapshot.data!["TimeSerie"].map<TimeDataModel>((data) {
-                            return TimeDataModel.withAll(
-                                t: data['t'],
-                                ax: data['ax'],
-                                ay: data['ay'],
-                                az: data['az'],
-                                gx: data['gx'],
-                                gy: data['gy'],
-                                gz: data['gz']
-                            );
-                          }
-                      ).toList()
-                          )
-                          );
-                    }
-                    if (snapshot.hasError) {
-                      return Text('error $snapshot.data["Activity"]');
-                    }
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: Text("waiting"),
-                      );
-                    }
-                    return const Text("not catched");
-                  }
-    ),
-            )
- */
+

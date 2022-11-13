@@ -5,7 +5,20 @@ class TimeSerieModel {
   late String owner;
   late DateTime date;
   late int duration;
-  late String activity;
+  
+  late String activity;//pullrequestmodif
+
+
+  TimeSerieModel.copy(TimeSerieModel ts){
+    timeSerie=new List<TimeDataModel>.from(ts.timeSerie);
+    owner=ts.owner;
+    date=ts.date;
+    duration=ts.duration;
+   
+    activity=ts.activity; //pullrequestmodif
+  }
+
+
 
   TimeSerieModel(this.owner) {
     timeSerie = [];
@@ -73,8 +86,24 @@ class TimeSerieModel {
   DateTime getDate() {
     return date;
   }
-
+  
   String getOwner() {
     return owner;
   }
+
+  TimeSerieModel crop(int start,int end){
+  
+    TimeSerieModel newTs=TimeSerieModel.copy(this);
+
+    newTs.timeSerie.removeRange(0, start);
+    newTs.timeSerie.removeRange(newTs.timeSerie.length-end,newTs.timeSerie.length);
+
+    //moche un peu...revoir ? 
+    Duration delta=new Duration(microseconds:(newTs.timeSerie[newTs.timeSerie.length-1].t)-(newTs.timeSerie[0].t));
+    newTs.duration=delta.inSeconds;
+
+    return newTs;
+  }
+
+
 }
