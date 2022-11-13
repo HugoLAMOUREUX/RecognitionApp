@@ -21,13 +21,7 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
   List<Map> staticData = Labels.data;
   int selectedIndex = 0;
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
-  final _secondController = TimeSeriesEditorController();
 
-  @override
-  void dispose(){
-    _secondController.dispose();
-    super.dispose();
-}
   Widget _buildSelectIcon(bool isSelected, Map data) {
     return Icon(
       isSelected ? Icons.check_box : Icons.check_box_outline_blank,
@@ -47,47 +41,13 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          title: Text("Time serie details"),
+        ),
         body: SingleChildScrollView(
           child: Center(
               child: Column(
             children: [
-
-              simpleTimeSerieBuilder(),
-              Row(
-                mainAxisAlignment:MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  SizedBox(
-                    width: 100,
-                      child:TextField(
-                    decoration: const InputDecoration(labelText: "Crop start"),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
-                    onChanged: (text){
-                      //if text non vide
-                      //ALSO CHECK PLUS TARD SI INT PAS TROP GRAND ?
-                      if(text.isNotEmpty) {
-                        _secondController.updateStart(int.parse(text));
-                      }
-                    },// Only numbers can be entered
-                  )),
-                  SizedBox(
-                      width: 100,
-                    child:TextField(
-                    decoration: const InputDecoration(labelText: "Crop end"),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
-                    onChanged: (text){
-                      if(text.isNotEmpty) {
-                        _secondController.updateEnd(int.parse(text));
-                      }
-                    },// Only numbers can be entered
-                  )
-                  )
-                ],),
 
               SizedBox(
                 height: 400,
@@ -138,6 +98,7 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
     );
   }
 
+  /*
   Future<Map<String, dynamic>> getDataFromFireStore() async {
 
     return await _firebaseFirestore
@@ -152,17 +113,10 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
       },
       onError: (e) => print("Error getting document: $e"),
     );
-  }
+  }*/
 
-  Widget simpleTimeSerieBuilder(){
-    return Container(
-      height: 300,
-        child: Center(
-          child:EditedTimeSeriesWidget(inputChartData: widget.timeSerie.getTimeSerieModel(),editorController: _secondController)
-    )
-    );
-  }
 
+/*
   Widget timeSerieBuilder(){
     return Container(
       height: 300,
@@ -198,5 +152,5 @@ class _LabelizeScreenState extends State<LabelizeScreen> {
           }
       ),
     );
-  }
+  }*/
 }

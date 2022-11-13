@@ -12,6 +12,7 @@ class TimeSeriesChartWidget extends StatelessWidget {
 
   TimeSeriesChartWidget( {Key? key,required this.seriesdata,this.color=Colors.blueAccent}) : super(key: key);
 
+
   final List<TimeDataModel> seriesdata;
   final Color color;
 

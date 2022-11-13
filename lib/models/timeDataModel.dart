@@ -1,5 +1,5 @@
 class TimeDataModel {
-  late int t;
+  late int t; //microsecondsSinceEpoch
   late double ax;
   late double ay;
   late double az;

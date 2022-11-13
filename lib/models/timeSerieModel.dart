@@ -11,6 +11,14 @@ class TimeSerieModel {
   late DateTime date;
   late int duration;
 
+  TimeSerieModel.copy(TimeSerieModel ts){
+    timeSerie=new List<TimeDataModel>.from(ts.timeSerie);
+    owner=ts.owner;
+    date=ts.date;
+
+    //bon faudra aussi modifier duration mais flemme hein
+    duration=ts.duration;
+  }
 
   TimeSerieModel(this.owner) {
     timeSerie = [];
@@ -60,6 +68,21 @@ class TimeSerieModel {
     Duration delta=endTime.difference(date);
     duration=delta.inSeconds;
     return duration;
+  }
+
+
+  TimeSerieModel crop(int start,int end){
+    TimeSerieModel newTs=TimeSerieModel.copy(this);
+    print("trying to remove $start and $end points");
+
+    newTs.timeSerie.removeRange(0, start);
+    newTs.timeSerie.removeRange(newTs.timeSerie.length-end,newTs.timeSerie.length);
+
+    //moche un peu
+    Duration delta=new Duration(microseconds:(newTs.timeSerie[newTs.timeSerie.length-1].t)-(newTs.timeSerie[0].t));
+    newTs.duration=delta.inSeconds;
+
+    return newTs;
   }
 
 

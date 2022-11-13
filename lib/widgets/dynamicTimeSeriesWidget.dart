@@ -53,8 +53,14 @@ class _DynamicTimeSeriesWidgetState extends State<DynamicTimeSeriesWidget> {
                 // X axis is hidden now
                   isVisible: false
               ),
+              primaryYAxis: NumericAxis(
+                //to hide labels but keep the grid
+                  labelStyle: TextStyle(
+                    fontSize: 0
+                  )
+              ),
               series:_getData(),
-              title:ChartTitle(text:"chart flutter")
+              title:ChartTitle(text:"Real Time Accelerometer Values")
           ),
       ],
     );
