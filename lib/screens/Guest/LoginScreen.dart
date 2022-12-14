@@ -3,6 +3,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:recognition/models/UserModel.dart';
 import 'package:recognition/screens/Guest/Guest.dart';
 import 'package:recognition/screens/Guest/RegisterScreen.dart';
+import 'package:recognition/screens/Guest/ResetPasswordScreen.dart';
 import 'package:recognition/screens/HomeScreen.dart';
 import 'package:recognition/screens/dataCollectionScreen.dart';
 import 'package:recognition/services/UserService.dart';
@@ -112,7 +113,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           TextButton(
                             onPressed: () {
-                              print('Forgotted Password!');
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          ResetPasswordScreen()),
+                                  (route) => false);
                             },
                             child: Text(
                               'Forgot Password?',

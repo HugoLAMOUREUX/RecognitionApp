@@ -41,4 +41,13 @@ class UserService {
   Future<void> logout() async {
     await _auth.signOut();
   }
+
+  Future<String> resetPassword(email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+      return "Email sent";
+    } catch (e) {
+      return "Error";
+    }
+  }
 }
