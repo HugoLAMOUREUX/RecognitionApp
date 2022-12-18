@@ -2,41 +2,54 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DownloadService {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   String jsonString = "";
 
-  Map dataFromFirebase(String user) {
-    var data;
-    if (user == null || user == "") {
-      data = _firebaseFirestore.collection("timeSeries").snapshots();
-      print(data);
-      print(data.runtimeType);
-    } else {}
-    //to delete
-    return new Map();
-  }
+  void writeDataSet(onlyUser) async {
+    //get the download directory on android
+    //ios ???
+    Directory generalDownloadDir = Directory('/storage/emulated/0/Download');
+    File file = await File('${generalDownloadDir.path}/dataset.json').create();
+    var data = [];
 
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
+    //get the data
+    _firebaseFirestore
+        .collection("timeSeries")
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        data.add(doc.data());
+      });
 
-    return directory.path;
-  }
+      if (onlyUser) {
+        data = data
+            .where((e) => e["Owner"] == FirebaseAuth.instance.currentUser!.uid)
+            .toList();
+      }
 
-  Future<File> get _localFile async {
-    final path = await _localPath;
-    return File('$path/dataset.json');
-  }
+      //changing the timestamp to string otherwhise we can't use jsonEncode
+      //jsonEncode usable only on String, int ...
+      data.forEach((element) {
+        element["Date"] = element["Date"].toString();
+        element["TimeSerie"].forEach((e) {
+          e["t"] = e["t"].toString();
+        });
+      });
 
-  Future<File> writeDataSet(Map json) async {
-    final file = await _localFile;
-
-    //Convert json ->jsonString
-    jsonString = jsonEncode(json);
-
-    // Write the file
-    return file.writeAsString('$jsonString');
+      //json->jsonString
+      jsonString = jsonEncode(data);
+      // Write the file
+      file.writeAsString('$jsonString');
+      //Confirm to the user that the file is downloaded
+      Fluttertoast.showToast(
+        msg: 'JSON file saved in Downloads',
+        fontSize: 18,
+      );
+    });
   }
 }

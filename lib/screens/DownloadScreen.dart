@@ -111,23 +111,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
               height: 30,
             ),
             ElevatedButton(
-              onPressed: (() {}),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.fromLTRB(40, 15, 40, 15),
-              ),
-              child: const Text(
-                'Receive the dataset via mail',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            ElevatedButton(
               onPressed: (() {
-                _downloadService.dataFromFirebase("");
+                _downloadService.writeDataSet(onlyUser);
               }),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.fromLTRB(40, 15, 40, 15),

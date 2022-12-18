@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class TimeDataModel {
   late int t; //microsecondsSinceEpoch
   late double ax;
@@ -16,6 +18,17 @@ class TimeDataModel {
     required this.gy,
     required this.gz,
   });
+
+  TimeDataModel.fromJson(Map<String, dynamic> json) {
+    TimeDataModel.withAll(
+        t: json['t'],
+        ax: json['ax'],
+        ay: json['ay'],
+        az: json['az'],
+        gx: json['gx'],
+        gy: json['gy'],
+        gz: json['gz']);
+  }
 
   TimeDataModel.withAcc({
     required this.t,
@@ -61,27 +74,17 @@ class TimeDataModel {
     this.gz = gz;
   }
 
-  Map<String,dynamic> toMap(){
-    return {
-      "t":t,
-      "ax":ax,
-      "ay":ay,
-      "az":az,
-      "gx":gx,
-      "gy":gy,
-      "gz":gz
-    };
+  Map<String, dynamic> toMap() {
+    return {"t": t, "ax": ax, "ay": ay, "az": az, "gx": gx, "gy": gy, "gz": gz};
   }
 
-  Map<String,dynamic> toSensorsMap(){
-    return {
-      "ax":ax,
-      "ay":ay,
-      "az":az,
-      "gx":gx,
-      "gy":gy,
-      "gz":gz
-    };
+  Map<String, dynamic> toSensorsMap() {
+    return {"ax": ax, "ay": ay, "az": az, "gx": gx, "gy": gy, "gz": gz};
+  }
+
+  //same as the one above
+  Map<String, dynamic> toJson() {
+    return {"t": t, "ax": ax, "ay": ay, "az": az, "gx": gx, "gy": gy, "gz": gz};
   }
 
   @override

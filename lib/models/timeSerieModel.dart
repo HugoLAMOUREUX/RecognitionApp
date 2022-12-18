@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:recognition/models/timeDataModel.dart';
 
 class TimeSerieModel {
@@ -5,23 +6,20 @@ class TimeSerieModel {
   late String owner;
   late DateTime date;
   late int duration;
-  
+
   late String activity;
 
-
-  TimeSerieModel.copy(TimeSerieModel ts){
-    timeSerie=new List<TimeDataModel>.from(ts.timeSerie);
-    owner=ts.owner;
-    date=ts.date;
-    duration=ts.duration;
+  TimeSerieModel.copy(TimeSerieModel ts) {
+    timeSerie = new List<TimeDataModel>.from(ts.timeSerie);
+    owner = ts.owner;
+    date = ts.date;
+    duration = ts.duration;
 
     /*
     activity=ts.activity;
     faudrait check si ts.activity est null ou pas
      */
   }
-
-
 
   TimeSerieModel(this.owner) {
     timeSerie = [];
@@ -63,6 +61,14 @@ class TimeSerieModel {
     return res;
   }
 
+  Map<String, dynamic> toJson() => {
+        'owner:': owner,
+        'activity': activity,
+        'date': date,
+        'duration': duration,
+        'timeSerie': timeSerie.map((e) => e.toJson()),
+      };
+
   void setTime(DateTime startTime) {
     date = startTime;
   }
@@ -89,24 +95,24 @@ class TimeSerieModel {
   DateTime getDate() {
     return date;
   }
-  
+
   String getOwner() {
     return owner;
   }
 
-  TimeSerieModel crop(int start,int end){
-  
-    TimeSerieModel newTs=TimeSerieModel.copy(this);
+  TimeSerieModel crop(int start, int end) {
+    TimeSerieModel newTs = TimeSerieModel.copy(this);
 
     newTs.timeSerie.removeRange(0, start);
-    newTs.timeSerie.removeRange(newTs.timeSerie.length-end,newTs.timeSerie.length);
+    newTs.timeSerie
+        .removeRange(newTs.timeSerie.length - end, newTs.timeSerie.length);
 
-    //moche un peu...revoir ? 
-    Duration delta=new Duration(microseconds:(newTs.timeSerie[newTs.timeSerie.length-1].t)-(newTs.timeSerie[0].t));
-    newTs.duration=delta.inSeconds;
+    //moche un peu...revoir ?
+    Duration delta = new Duration(
+        microseconds: (newTs.timeSerie[newTs.timeSerie.length - 1].t) -
+            (newTs.timeSerie[0].t));
+    newTs.duration = delta.inSeconds;
 
     return newTs;
   }
-
-
 }
