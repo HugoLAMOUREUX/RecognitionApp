@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:recognition/services/DownloadService.dart';
 
 class DownloadScreen extends StatefulWidget {
   const DownloadScreen({super.key});
@@ -11,6 +12,7 @@ class DownloadScreen extends StatefulWidget {
 
 class _DownloadScreenState extends State<DownloadScreen> {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  final DownloadService _downloadService = DownloadService();
 
   int nbDocs = 0;
   bool onlyUser = false;
@@ -109,22 +111,9 @@ class _DownloadScreenState extends State<DownloadScreen> {
               height: 30,
             ),
             ElevatedButton(
-              onPressed: (() {}),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.fromLTRB(40, 15, 40, 15),
-              ),
-              child: const Text(
-                'Receive the dataset via mail',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            ElevatedButton(
-              onPressed: (() {}),
+              onPressed: (() {
+                _downloadService.writeDataSet(onlyUser);
+              }),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.fromLTRB(40, 15, 40, 15),
               ),
