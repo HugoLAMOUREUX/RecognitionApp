@@ -80,7 +80,7 @@ If you click on start an activity, you'll start to record an activity. You'll th
 
 ## License
 
-Distributed under the MIT License. See [LICENSE.txt](https://github.com/HugoLAMOUREUX/RecognitionApp/blob/main/LICENSE.txt) for more information.
+Distributed under the MIT License. See [LICENSE](https://github.com/HugoLAMOUREUX/RecognitionApp/blob/main/LICENSE) for more information.
 
 ## Contact
 
